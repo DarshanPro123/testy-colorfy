@@ -1,0 +1,27 @@
+{
+  "name": "testy-colorfy",
+  "version": "0.0.1",
+  "description": "",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "prepare": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DarshanPro123/testy-colorfy.git"
+  },
+  "author": "Darshan Panchal",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DarshanPro123/testy-colorfy/issues"
+  },
+  "homepage": "https://github.com/DarshanPro123/testy-colorfy#readme",
+  "devDependencies": {
+    "typescript": "^5.7.3"
+  },
+  "files": [
+    "dist/**/*"
+  ]
+}
