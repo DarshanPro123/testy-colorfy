@@ -1,6 +1,6 @@
 {
   "name": "testy-colorfy",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/DarshanPro123/testy-colorfy#readme",
   "devDependencies": {
+    "@types/node": "^20.11.0",
     "typescript": "^5.7.3"
   },
   "files": [
