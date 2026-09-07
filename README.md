@@ -1,150 +1,152 @@
 # testy-colorfy
 
-> 🎨 Colorful, configurable Node.js console logger — zero dependencies.
+> 🎨 Fast, ultra-simple, colorful Node.js & TypeScript logger with automatic file path & line number caller tracing. Zero dependencies.
 
 [![npm version](https://img.shields.io/npm/v/testy-colorfy)](https://www.npmjs.com/package/testy-colorfy)
 [![license](https://img.shields.io/npm/l/testy-colorfy)](./LICENSE)
 
-## Install
+---
+
+## ⚡ Key Features
+
+- 📍 **Auto File Path & Line Tracing**: Automatically detects and prints where the log was called from (`[src/index.ts:15:8]`).
+- 🚀 **Zero Setup Required**: Import `logger` or `log` and start logging immediately.
+- 🎨 **Vibrant Colors & Emojis**: Clean ANSI colored outputs with level badges.
+- 📦 **Dual ESM & CommonJS**: Works seamlessly in modern TypeScript ESM (`import`) & Node.js CommonJS (`require`).
+- ⚡ **Ultra-Fast & Zero Dependencies**: Lightweight, high performance formatting.
+
+---
+
+## 📦 Install
 
 ```sh
 npm install testy-colorfy
 ```
 
-## Quick Start
-
-```js
-const { Logger } = require("testy-colorfy");
-// or: import { Logger } from "testy-colorfy";
-
-Logger.success("User logged in");
-Logger.error("Something went wrong");
-Logger.warning("Memory usage above 80%");
-Logger.info("Server running on port 3000");
-Logger.debug("GET /api/users");
-```
-
-| Method | Color | Emoji |
-|---|---|---|
-| `success` | 🟢 Green | `✔` |
-| `error` | 🔴 Red | `✖` |
-| `warning` | 🟡 Yellow | `⚠` |
-| `info` | 🔵 Blue | `ℹ` |
-| `debug` | ⚫ Gray | `⚙` |
-
 ---
 
-## Configuration
+## 🚀 Quick Start
 
+### ESM (TypeScript / Modern Node.js)
+```ts
+import { log } from "testy-colorfy";
+
+log.info("Server running on port 3000");
+log.success("User authenticated successfully");
+log.warn("High memory consumption detected");
+log.error("Failed to connect to database", new Error("Timeout"));
+log.debug("User payload", { id: 101, role: "admin" });
+```
+
+### CommonJS (Node.js)
 ```js
-Logger.configure({
-  timestamp:       true,        // show timestamp
-  timestampFormat: "datetime",  // "time" | "datetime" | "iso"
-  prefix:          "API",       // [API] label
-  emoji:           true,        // true | false | custom object
-  noColor:         false,       // true = plain text (CI safe)
-});
+const { logger } = require("testy-colorfy");
 
-Logger.success("Payment processed");
-// → [2026-06-07 10:30:45] [API] ✔ Payment processed
-
-Logger.resetConfig(); // back to defaults
+logger.info("Application starting...");
+logger.success("Payment processed successfully");
 ```
 
 ---
 
-## Timestamp Formats
+## 📍 Automatic File Path Caller Tracing
 
-```js
-Logger.configure({ timestamp: true, timestampFormat: "time" });
-// → [10:30:45 AM] ℹ message
+By default, `testy-colorfy` automatically inspects the call stack and prints the caller file path and line number:
 
-Logger.configure({ timestamp: true, timestampFormat: "datetime" });
-// → [2026-06-07 10:30:45] ℹ message
-
-Logger.configure({ timestamp: true, timestampFormat: "iso" });
-// → [2026-06-07T10:30:45.000Z] ℹ message
+```ts
+// src/services/auth.ts (line 24)
+log.info("Generating token");
+// Output: [src/services/auth.ts:24:5] ℹ Generating token
 ```
 
----
+### File Path Modes
+You can customize or turn off file path tracing via `Logger.configure`:
 
-## Custom Emojis
-
-```js
-const log = new Logger({
-  emoji: { success: "🚀", error: "💥", warning: "🔔", info: "📢", debug: "🐛" }
-});
-
-log.success("Deployed!");   // → 🚀 Deployed!
-log.error("Build failed");  // → 💥 Build failed
-```
-
----
-
-## Instance Logger (per-module config)
-
-```js
-const dbLogger   = new Logger({ prefix: "DB",   timestamp: true });
-const authLogger = new Logger({ prefix: "AUTH", emoji: false });
-
-dbLogger.success("Connected");       // → [10:30:45 AM] [DB] ✔ Connected
-authLogger.info("Token generated");  // → [AUTH] Token generated
-```
-
----
-
-## noColor Mode (CI / file logging)
-
-```js
-const ciLogger = new Logger({ noColor: true });
-ciLogger.success("Tests passed: 42/42"); // plain text, no color codes
-```
-
----
-
-## Screenshots
-
-![Basic colored output](https://raw.githubusercontent.com/DarshanPro123/testy-colorfy/3759168a6b574adc400aa944069eb9517f1996c6/assets/demo1.png)
-
-![Timestamp and prefix demo](https://raw.githubusercontent.com/DarshanPro123/testy-colorfy/3759168a6b574adc400aa944069eb9517f1996c6/assets/demo2.png)
-
-![Custom emojis and instance loggers](https://raw.githubusercontent.com/DarshanPro123/testy-colorfy/3759168a6b574adc400aa944069eb9517f1996c6/assets/demo3.png)
-
----
-
-## API Reference
-
-| Method | Description |
-|---|---|
-| `Logger.success / error / warning / info / debug` | Log with color + emoji |
-| `Logger.configure(options)` | Update global config |
-| `Logger.resetConfig()` | Reset to defaults |
-| `new Logger(options)` | Create instance with its own config |
-
-### LoggerConfig
-
-| Option | Type | Default |
-|---|---|---|
-| `timestamp` | `boolean` | `false` |
-| `timestampFormat` | `"time" \| "datetime" \| "iso"` | `"time"` |
-| `prefix` | `string` | `""` |
-| `emoji` | `boolean \| CustomEmojis` | `true` |
-| `noColor` | `boolean` | `false` |
-
----
-
-## Legacy (Deprecated)
-
-```js
-// Old — still works but deprecated
-import { Loger } from "testy-colorfy";
-Loger.sucess("message");
-
-// New — use this
+```ts
 import { Logger } from "testy-colorfy";
-Logger.success("message");
+
+// Relative path (Default): [src/controllers/user.ts:42:10]
+Logger.configure({ showFilePath: true, filePathMode: "relative" });
+
+// Basename only: [user.ts:42:10]
+Logger.configure({ showFilePath: true, filePathMode: "basename" });
+
+// Full absolute path: [/Users/dev/app/src/controllers/user.ts:42:10]
+Logger.configure({ showFilePath: true, filePathMode: "absolute" });
+
+// Disable file path tracing
+Logger.configure({ showFilePath: false });
 ```
 
 ---
 
-ISC © [Darshan Panchal](https://github.com/DarshanPro123)
+## ⚙️ Configuration Options
+
+Global configuration applies to default exports (`log` and `logger`) and `Logger` static methods.
+
+```ts
+import { Logger, log } from "testy-colorfy";
+
+Logger.configure({
+  showFilePath: true,           // Auto show file path & line caller
+  filePathMode: "relative",     // "relative" | "basename" | "absolute"
+  timestamp: true,              // Show timestamp
+  timestampFormat: "time",      // "time" | "datetime" | "iso"
+  prefix: "API",                // Custom label: [API]
+  emoji: true,                  // Show level emoji
+  noColor: false,               // Disable ANSI color (useful for CI / file logs)
+});
+
+log.success("User created");
+// → [10:30:45 AM] [API] [src/routes/user.ts:15:3] ✔ User created
+```
+
+---
+
+## 🎨 Custom Emojis & Per-Module Loggers
+
+### Custom Emojis
+```ts
+Logger.configure({
+  emoji: {
+    success: "🚀",
+    error: "💥",
+    warning: "🔔",
+    info: "📢",
+    debug: "🐛",
+  },
+});
+```
+
+### Scoped Logger Instances
+Create per-module instances with independent configurations:
+
+```ts
+import { Logger } from "testy-colorfy";
+
+const dbLogger = new Logger({ prefix: "DB", timestamp: true });
+const authLogger = new Logger({ prefix: "AUTH" });
+
+dbLogger.success("Connected to Postgres"); 
+// → [10:30:45 AM] [DB] [src/db.ts:12:4] ✔ Connected to Postgres
+
+authLogger.info("JWT token generated"); 
+// → [AUTH] [src/auth.ts:30:2] ℹ JWT token generated
+```
+
+---
+
+## 📋 Level Reference
+
+| Method | Level Color | Default Emoji |
+|---|---|---|
+| `log.success(...)` | 🟢 Green | `✔` |
+| `log.error(...)` | 🔴 Red | `✖` |
+| `log.warn(...)` / `log.warning(...)` | 🟡 Yellow | `⚠` |
+| `log.info(...)` | 🔵 Blue | `ℹ` |
+| `log.debug(...)` | ⚫ Gray | `⚙` |
+
+---
+
+## 📄 License
+
+[ISC](./LICENSE) © Darshan Panchal
